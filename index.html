@@ -37,6 +37,26 @@
 <section class="page" id="page-pools"><div class="hero"><div><div class="eyebrow">LIQUIDITY PORTFOLIO</div><h1 class="title">My pools</h1><div class="sub">View liquidity pools associated with your wallet.</div></div><button class="btn" data-go="liquidity">Manage liquidity</button></div><div class="card"><div id="myPoolList"><div class="empty">No pools created yet.</div></div></div></section>
 </div></main></div>
 <div class="toast" id="toast"></div><div class="modalwrap" id="removeModal"><div class="modal"><h3>Remove liquidity</h3><p id="removePoolLabel">Choose the percentage of LP tokens to withdraw. The transaction returns the pool assets according to current reserves, less fees and slippage.</p><div class="stat" style="margin:15px 0"><small>LP token balance</small><strong id="lpBalance">—</strong></div><div class="actions" style="margin:12px 0"><button class="btn small" data-remove-pct="25">25%</button><button class="btn small" data-remove-pct="50">50%</button><button class="btn small" data-remove-pct="75">75%</button><button class="btn small" data-remove-pct="100">100%</button></div><input id="removePct" type="range" min="1" max="100" value="50" style="width:100%;accent-color:#8c5cff"><div style="text-align:center;margin:8px 0 18px;font-weight:700" id="removePctLabel">50%</div><div class="actions" style="justify-content:flex-end"><button class="btn" id="cancelRemove">Cancel</button><button class="btn primary" id="confirmRemove">Remove Liquidity</button></div></div></div><div class="modalwrap" id="modal"><div class="modal"><h3 id="modalTitle">Confirm</h3><p id="modalText"></p><div class="actions" style="justify-content:flex-end;margin-top:20px"><button class="btn" id="modalCancel">Cancel</button><button class="btn primary" id="modalOk">Continue</button></div></div></div>
+<script>
+/* Keep page navigation independent from wallet/SDK module loading. */
+(function(){
+ const labels={create:'Create Token',trending:'Copy Trending',liquidity:'Manage Liquidity',tokens:'My Tokens',pools:'My Pools'};
+ function showPage(name){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.toggle('active',p.id==='page-'+name)});
+  document.querySelectorAll('.nav[data-page]').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-page')===name)});
+  var crumb=document.getElementById('crumb'); if(crumb) crumb.textContent='Launchpad / '+(labels[name]||name);
+  if(!document.getElementById('page-'+name)) return;
+  window.scrollTo(0,0);
+ }
+ document.addEventListener('click',function(e){
+  var nav=e.target.closest('.nav[data-page]');
+  var go=e.target.closest('[data-go]');
+  if(nav){e.preventDefault();showPage(nav.getAttribute('data-page'))}
+  else if(go){e.preventDefault();showPage(go.getAttribute('data-go'))}
+ });
+ window.alphaShowPage=showPage;
+})();
+</script>
 <script type="module">
 import {Connection,PublicKey,Keypair,SystemProgram,Transaction,clusterApiUrl} from 'https://esm.sh/@solana/web3.js@1.95.3';
 import {TOKEN_PROGRAM_ID,MINT_SIZE,createInitializeMintInstruction,getAssociatedTokenAddress,createAssociatedTokenAccountInstruction,createMintToInstruction,createSetAuthorityInstruction,AuthorityType,getMint} from 'https://esm.sh/@solana/spl-token@0.4.8';
