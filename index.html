@@ -28,7 +28,7 @@
 <button class="btn primary" id="createTokenBtn" style="width:100%;padding:14px">Create Token + Metadata on Devnet →</button></div>
 <div><div class="card"><div class="cardhead"><div class="cardtitle">Live preview</div><span class="muted">TOKEN CARD</span></div><div class="preview"><img id="previewImg" class="coinimg" src="" alt="" style="display:none"><div id="previewFallback" class="coinimg">✦</div><h3 id="previewName">Your Token</h3><p id="previewSymbol">$SYMBOL · Solana</p><p id="previewDesc">Your token description will appear here.</p></div><div class="grid2" style="grid-template-columns:1fr 1fr;margin-top:13px;gap:10px"><div class="stat"><small>Total supply</small><strong id="previewSupply">1B</strong></div><div class="stat"><small>Decimals</small><strong id="previewDecimals">9</strong></div></div></div><div class="notice">✓ Phantom wallet signing<br>✓ SPL token mint on Solana Devnet<br>✓ Token history saved in this browser<br><br>Raydium liquidity transactions are a separate step and are not enabled yet.</div></div></div></section>
 <section class="page" id="page-trending"><div class="hero"><div><div class="eyebrow">DISCOVER & RECREATE</div><h1 class="title">Copy trending coins</h1><div class="sub">Browse recently surfaced Solana tokens and copy their visible details into your own new-token form. This creates a new mint; it does not duplicate or take over the original token.</div></div><button class="btn primary" id="refreshTrending">↻ Refresh tokens</button></div>
-<div class="card"><div class="tabs"><button class="tab active" data-trend="dex-top">DexScreener Trending</button><button class="tab" data-trend="dex-boosts">DexScreener Latest Boosts</button><button class="tab" data-trend="raydium-trending">Raydium Trending</button><button class="tab" data-trend="raydium-volume">Raydium 24h Volume</button><button class="tab" data-trend="dex-latest">Latest Profiles</button><button class="tab" data-trend="saved">Saved / copied</button></div><div class="notice" id="trendNotice" style="margin-bottom:16px">Source: DexScreener Top Boosts API — Solana tokens with the most active boosts.</div><div id="trendingList" class="tokenlist"><div class="empty">Click Refresh tokens to load Solana listings.</div></div></div></section>
+<div class="card"><div class="tabs compact-tabs"><button class="tab active" data-feed="trending">Trending</button><button class="tab" data-feed="new">New</button><select id="trendSource" class="input" style="width:auto;min-width:125px;margin-left:auto;padding:9px 12px"><option value="dex">DexScreener</option><option value="raydium">Raydium</option></select></div><div class="notice" id="trendNotice" style="margin-bottom:16px">Trending Solana tokens from DexScreener.</div><div id="trendingList" class="tokenlist"><div class="empty">Tap Refresh tokens to load live Solana listings.</div></div></div></section>
 <section class="page" id="page-liquidity"><div class="hero"><div><div class="eyebrow">RAYDIUM POOLS</div><h1 class="title">Manage liquidity</h1><div class="sub">Prepare a liquidity pool for one of your tokens. Pool creation and liquidity removal require audited Raydium transaction integration.</div></div></div>
 <div class="grid2"><div class="card"><div class="cardhead"><div class="cardtitle">Create liquidity pool</div><span class="muted">RAYDIUM CPMM</span></div><div class="field"><label>Select token</label><select id="poolToken"><option value="">Select one of your tokens</option></select></div><div class="stat" style="margin-bottom:15px"><small>Selected token balance</small><strong id="poolTokenBalance">—</strong></div><div class="field"><label>Token amount</label><input id="poolAmount" type="number" placeholder="Amount of token"></div><div class="actions" style="margin-top:-8px;margin-bottom:15px"><button class="btn small" data-pct="50">Half</button><button class="btn small" data-pct="90">90%</button><button class="btn small" data-pct="100">Max</button></div><div class="field"><label>Pair with SOL (Devnet)</label><input id="poolSol" type="number" placeholder="e.g. 0.5" step="0.01"></div><div class="actions" style="margin-top:-8px;margin-bottom:16px"><button class="btn small" data-sol="0.1">0.1 SOL</button><button class="btn small" data-sol="0.3">0.3 SOL</button><button class="btn small" data-sol="1">1 SOL</button></div><button class="btn primary" id="createPoolBtn" style="width:100%">Create Raydium CPMM Pool →</button><p class="muted" style="line-height:1.6;margin-top:12px">Devnet only. Your wallet will show the complete transaction before signing. You need the selected token and Devnet SOL for the pool seed, rent and protocol fee.</p></div>
 <div class="card"><div class="cardhead"><div class="cardtitle">Pool overview</div><span class="muted">YOUR POOLS</span></div><div id="poolList"><div class="empty">No pools created from this browser yet.</div></div></div></div>
@@ -125,4 +125,44 @@ $('cancelRemove').onclick=()=>$('removeModal').classList.remove('show');
 $('confirmRemove').onclick=async()=>{if(!removingPool||!publicKey)return;const pct=Number($('removePct').value),raw=BigInt(removingPool._lpRaw||'0')*BigInt(pct)/100n;if(raw<=0n){toast('No LP tokens available to withdraw.');return}const btn=$('confirmRemove');btn.disabled=true;btn.textContent='Preparing withdrawal…';try{const raydium=await Raydium.load({owner:publicKey,connection:conn,cluster:'devnet',disableLoadToken:true});const data=await raydium.cpmm.getPoolInfoFromRpc(removingPool.poolId);const {execute}=await raydium.cpmm.withdrawLiquidity({poolInfo:data.poolInfo,poolKeys:data.poolKeys,lpAmount:new BN(raw.toString()),txVersion:TxVersion.V0,slippage:new Percent(1,100)});toast('Review liquidity withdrawal in Phantom.');const {txId}=await execute({sendAndConfirm:true});$('removeModal').classList.remove('show');toast('Liquidity withdrawn. Transaction: '+short(txId));}catch(e){console.error(e);toast('Withdrawal failed: '+(e.message||String(e)).slice(0,180))}finally{btn.disabled=false;btn.textContent='Remove Liquidity'}};
 
 renderTokens();renderPools();preview();
-</script></body></html>
+<script>
+/* Standalone discovery controls: work even if optional wallet SDK imports fail. */
+(function(){
+ let feed='trending', source='dex', rows=[];
+ const $=id=>document.getElementById(id);
+ const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function notice(s){if($('trendNotice'))$('trendNotice').textContent=s}
+ function draw(){
+  const box=$('trendingList'); if(!rows.length){box.innerHTML='<div class="empty">No Solana tokens were returned by this feed. Try another source or refresh.</div>';return}
+  box.innerHTML=rows.map((t,i)=>'<div class="token"><img src="'+esc(t.icon||t.header||'')+'" onerror="this.style.visibility=\'hidden\'" style="width:42px;height:42px;object-fit:cover;border-radius:12px"><div class="tokeninfo"><strong>'+esc(t.name||'Solana token')+(t.symbol?' · 
++esc(t.symbol):'')+'</strong><small>'+esc(t.address||'')+(t.marketCap?' · MCap 
++Number(t.marketCap).toLocaleString():'')+'</small></div><button class="btn small" data-recreate="'+i+'">Copy to Create</button></div>').join('');
+  box.querySelectorAll('[data-recreate]').forEach(b=>b.onclick=()=>{const t=rows[Number(b.dataset.recreate)];if($('tokenName'))$('tokenName').value=t.name||'';if($('tokenSymbol'))$('tokenSymbol').value=t.symbol||'';if($('tokenDesc'))$('tokenDesc').value=t.description||'';if(t.icon&&$('previewImg')){$('previewImg').src=t.icon;$('previewImg').style.display='block';$('previewFallback').style.display='none'}if(window.alphaShowPage)window.alphaShowPage('create')});
+ }
+ async function refresh(){
+  const box=$('trendingList');box.innerHTML='<div class="empty">Loading live Solana tokens…</div>';
+  try{
+   if(source==='raydium'&&feed==='new'){notice('Raydium provides pool rankings, not a reliable new-token feed. Choose DexScreener for New.');rows=[];draw();return}
+   if(source==='raydium'){
+    const u='https://api-v3.raydium.io/pools/info/list?poolType=all&poolSortField=volume24h&sortType=desc&pageSize=50&page=1';
+    const r=await fetch(u);if(!r.ok)throw Error('Raydium API HTTP '+r.status);const j=await r.json();
+    const list=Array.isArray(j.data?.data)?j.data.data:Array.isArray(j.data)?j.data:[];
+    const skip=new Set(['So11111111111111111111111111111111111111112','EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v','Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB']);
+    const seen=new Set();rows=[];
+    for(const p of list){const a=p.mintA||{},b=p.mintB||{},m=[a,b].find(x=>x.address&&!skip.has(x.address));if(!m||seen.has(m.address))continue;seen.add(m.address);rows.push({address:m.address,name:m.name||m.symbol||'Solana token',symbol:m.symbol,icon:m.logoURI||m.logoUri,marketCap:p.marketCap,description:'',source:'Raydium'})}
+    notice('Raydium live pools ranked by 24-hour volume.');draw();return;
+   }
+   const endpoint=feed==='trending'?'https://api.dexscreener.com/token-boosts/top/v1':'https://api.dexscreener.com/token-profiles/latest/v1';
+   const r=await fetch(endpoint,{cache:'no-store'});if(!r.ok)throw Error('DexScreener API HTTP '+r.status);
+   const data=await r.json();rows=(Array.isArray(data)?data:[]).filter(x=>String(x.chainId).toLowerCase()==='solana').slice(0,40).map(x=>({address:x.tokenAddress||'',name:x.description||x.header||'Solana token',symbol:'',icon:x.icon||x.header||'',description:x.description||'',source:'DexScreener'})).filter(x=>x.address);
+   const addrs=rows.slice(0,15).map(x=>x.address);
+   await Promise.all(addrs.map(async a=>{try{const q=await fetch('https://api.dexscreener.com/latest/dex/tokens/'+a);if(!q.ok)return;const j=await q.json();const p=(j.pairs||[]).filter(z=>z.chainId==='solana').sort((x,y)=>(y.volume?.h24||0)-(x.volume?.h24||0))[0];if(!p)return;const t=rows.find(z=>z.address===a);if(t){t.name=p.baseToken?.name||t.name;t.symbol=p.baseToken?.symbol||'';t.marketCap=p.marketCap||p.fdv;t.icon=p.info?.imageUrl||t.icon}}catch(e){}}));
+   notice(feed==='trending'?'DexScreener Top Boosts · live Solana tokens with active boosts.':'DexScreener Latest Profiles · recently published Solana tokens.');draw();
+  }catch(e){box.innerHTML='<div class="empty">Could not load live listings: '+esc(e.message)+'. Check connection or try another source.</div>';notice('Feed request failed.')}
+ }
+ document.addEventListener('click',e=>{const b=e.target.closest('[data-feed]');if(!b)return;feed=b.dataset.feed;document.querySelectorAll('[data-feed]').forEach(x=>x.classList.toggle('active',x===b));refresh()});
+ $('trendSource')?.addEventListener('change',e=>{source=e.target.value;refresh()});
+ $('refreshTrending')?.addEventListener('click',refresh);
+ window.addEventListener('load',()=>{if(location.hash==='#trending-autoload')refresh()});
+})();
+</script></script></body></html>
