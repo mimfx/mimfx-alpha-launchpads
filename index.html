@@ -128,49 +128,78 @@ $('confirmRemove').onclick=async()=>{if(!removingPool||!publicKey)return;const p
 renderTokens();renderPools();preview();
 <script>
 (function(){
-  let feed='trending', rows=[], busy=false;
+  'use strict';
+  let feed='trending', rows=[], busy=false, requestId=0;
   const $=id=>document.getElementById(id);
   const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const short=s=>s?String(s).slice(0,5)+'…'+String(s).slice(-5):'';
   const money=n=>Number(n)>0?'$'+Number(n).toLocaleString(undefined,{maximumFractionDigits:0}):'—';
-  function message(s){$('trendNotice').textContent=s}
+  function message(s){const n=$('trendNotice');if(n)n.textContent=s}
   function paint(){
-    const box=$('trendingList');
+    const box=$('trendingList'); if(!box)return;
     if(!rows.length){box.innerHTML='<div class="empty">No Pump.fun tokens were returned. Tap Refresh to try again.</div>';return}
-    box.innerHTML=rows.map((t,i)=>'<div class="token"><img src="'+esc(t.image||'')+'" onerror="this.style.display=\'none\'" style="width:44px;height:44px;object-fit:cover;border-radius:12px"><div class="tokeninfo"><strong>'+esc(t.name||'Solana token')+(t.symbol?' · $'+esc(t.symbol):'')+'</strong><small>'+esc(short(t.address))+' · MC '+money(t.marketCap)+(t.created?' · '+esc(new Date(t.created).toLocaleString()):'')+'</small></div><button class="btn small" data-copy-row="'+i+'">Copy to Create</button></div>').join('');
+    box.innerHTML=rows.map((t,i)=>'<div class="token"><img src="'+esc(t.image||'')+'" onerror="this.style.display=\'none\'" style="width:44px;height:44px;object-fit:cover;border-radius:12px"><div class="tokeninfo"><strong>'+esc(t.name||'Solana token')+(t.symbol?' · $'+esc(t.symbol):'')+'</strong><small>'+esc(short(t.address))+' · MC '+money(t.marketCap)+(t.created?' · '+esc(new Date(t.created).toLocaleString()):'')+'</small></div><button class="btn small" type="button" data-copy-row="'+i+'">Copy to Create</button></div>').join('');
     box.querySelectorAll('[data-copy-row]').forEach(b=>b.addEventListener('click',()=>copy(rows[Number(b.dataset.copyRow)])));
   }
   async function pumpRows(kind){
-    const sort=kind==='new'?'created_timestamp':'last_trade_timestamp';
-    const url='https://alpha-memes-pump-feed.onrender.com/api/pump/coins?feed='+encodeURIComponent(kind);
-    const r=await fetch(url,{cache:'no-store',headers:{'Accept':'application/json'}});
-    if(!r.ok)throw Error('Pump.fun feed proxy returned HTTP '+r.status);
-    const payload=await r.json();
-    if(!payload.ok||!Array.isArray(payload.coins))throw Error(payload.error||'Unexpected Pump.fun response');
-    return payload.coins.map(x=>({address:x.mint,name:x.name||'Solana token',symbol:x.symbol||'',image:x.image||'',description:x.description||'',marketCap:Number(x.marketCap||0),created:Number(x.created||0),source:'Pump.fun'}));
+    const url='https://alpha-memes-pump-feed.onrender.com/api/pump/coins?feed='+encodeURIComponent(kind)+'&t='+Date.now();
+    let last;
+    for(let attempt=0;attempt<3;attempt++){
+      try{
+        const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),25000);
+        let r; try{r=await fetch(url,{cache:'no-store',headers:{'Accept':'application/json'},signal:controller.signal})}finally{clearTimeout(timer)}
+        if(!r.ok)throw Error('Feed server HTTP '+r.status);
+        const payload=await r.json();
+        if(!payload.ok||!Array.isArray(payload.coins))throw Error(payload.error||'Unexpected Pump.fun response');
+        return payload.coins.map(x=>({address:x.mint,name:x.name||'Solana token',symbol:x.symbol||'',image:x.image||'',description:x.description||'',marketCap:Number(x.marketCap||0),created:Number(x.created||0),source:'Pump.fun'}));
+      }catch(e){last=e;if(attempt<2)await new Promise(resolve=>setTimeout(resolve,1800*(attempt+1)))}
+    }
+    throw last||Error('Pump.fun feed unavailable');
   }
   async function refresh(){
-    if(busy)return;busy=true;const btn=$('refreshTrending');if(btn){btn.disabled=true;btn.textContent='Loading…'}
-    $('trendingList').innerHTML='<div class="empty">Loading live Pump.fun tokens…</div>';
-    message(feed==='trending'?'Loading active Pump.fun tokens, ordered by latest trade activity…':'Loading newly created Pump.fun tokens…');
+    if(busy)return;busy=true;const myRequest=++requestId;const btn=$('refreshTrending');
+    if(btn){btn.disabled=true;btn.textContent='Loading…'}
+    const box=$('trendingList');if(box)box.innerHTML='<div class="empty">Connecting to Pump.fun and loading live tokens…</div>';
+    message(feed==='trending'?'Loading active Pump.fun tokens…':'Loading newly created Pump.fun tokens…');
     try{
-      rows=await pumpRows(feed);
-      message('Source: Pump.fun · '+(feed==='trending'?'Trending — latest trade activity':'New — newest token launches')+'. Updated '+new Date().toLocaleTimeString()+'.');
+      const result=await pumpRows(feed);
+      if(myRequest!==requestId)return;
+      rows=result;
+      message('Pump.fun · '+(feed==='trending'?'Trending — latest trade activity':'New — newest token launches')+' · '+rows.length+' tokens · Updated '+new Date().toLocaleTimeString());
       paint();
     }catch(e){
-      rows=[];$('trendingList').innerHTML='<div class="empty">Pump.fun feed error: '+esc(e.message)+'. Tap Refresh to retry.</div>';
-      message('Could not load Pump.fun listings. The Pump.fun public feed may be temporarily unavailable or rate-limiting requests.');
-    }finally{busy=false;if(btn){btn.disabled=false;btn.textContent='↻ Refresh tokens'}}
+      if(myRequest!==requestId)return;
+      rows=[];if(box)box.innerHTML='<div class="empty">Could not connect to the Pump.fun feed: '+esc(e.message)+'. Please tap Refresh again in a moment.</div>';
+      message('Pump.fun feed connection failed. '+e.message);
+    }finally{
+      if(myRequest===requestId){busy=false;if(btn){btn.disabled=false;btn.textContent='↻ Refresh tokens'}}
+    }
   }
   function copy(t){
-    $('tokenName').value=t.name||'';$('tokenSymbol').value=t.symbol||'';$('tokenDesc').value=t.description||'';
-    if(t.image){$('previewImg').src=t.image;$('previewImg').style.display='block';$('previewFallback').style.display='none'}
+    if(!t)return;
+    const n=$('tokenName'),s=$('tokenSymbol'),d=$('tokenDesc');
+    if(n)n.value=t.name||'';if(s)s.value=t.symbol||'';if(d)d.value=t.description||'';
+    if(t.image&&$('previewImg')){$('previewImg').src=t.image;$('previewImg').style.display='block';if($('previewFallback'))$('previewFallback').style.display='none'}
     if(window.alphaShowPage)window.alphaShowPage('create');
-    if(typeof window.toast==='function')window.toast('Details copied from Pump.fun. This creates a NEW mint; it does not copy the original token.');
+    if(typeof window.toast==='function')window.toast('Details copied from Pump.fun. This creates a NEW mint; original token unchanged.');
   }
-  document.querySelectorAll('#page-trending [data-feed]').forEach(b=>{b.type='button';b.addEventListener('click',e=>{e.preventDefault();feed=b.dataset.feed==='new'?'new':'trending';document.querySelectorAll('#page-trending [data-feed]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});refresh()})});
-  window.alphaRefreshTrending=refresh;
-  window.alphaSetFeed=function(next){feed=next==='new'?'new':'trending';document.querySelectorAll('#page-trending [data-feed]').forEach(x=>{x.classList.toggle('active',x.dataset.feed===feed);x.setAttribute('aria-pressed',String(x.dataset.feed===feed))});refresh()};
-  document.addEventListener('click',e=>{const n=e.target.closest('.nav[data-page]');if(n&&n.dataset.page==='trending')setTimeout(refresh,80)});
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{if(document.getElementById('page-trending')?.classList.contains('active'))refresh()});else if(document.getElementById('page-trending')?.classList.contains('active'))refresh();
-})();</script></body></html>
+  function setFeed(next){
+    feed=next==='new'?'new':'trending';
+    document.querySelectorAll('#page-trending [data-feed]').forEach(b=>{
+      const active=b.dataset.feed===feed;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));
+    });
+    refresh();
+  }
+  document.querySelectorAll('#page-trending [data-feed]').forEach(b=>{
+    b.type='button';b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();setFeed(b.dataset.feed)});
+  });
+  window.alphaRefreshTrending=refresh;window.alphaSetFeed=setFeed;
+  document.addEventListener('click',e=>{
+    const n=e.target.closest('.nav[data-page]');
+    if(n&&n.dataset.page==='trending')setTimeout(refresh,120);
+  });
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{
+    if($('page-trending')?.classList.contains('active'))refresh();
+  }); else if($('page-trending')?.classList.contains('active'))refresh();
+})();
+</script></body></html>
