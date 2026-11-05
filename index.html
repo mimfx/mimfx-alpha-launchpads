@@ -29,7 +29,7 @@ html,body{max-width:100%;overflow-x:hidden}#page-trending .hero{display:flex;ali
 <button class="btn primary" id="createTokenBtn" style="width:100%;padding:14px">Create Token + Metadata on Devnet →</button></div>
 <div><div class="card"><div class="cardhead"><div class="cardtitle">Live preview</div><span class="muted">TOKEN CARD</span></div><div class="preview"><img id="previewImg" class="coinimg" src="" alt="" style="display:none"><div id="previewFallback" class="coinimg">✦</div><h3 id="previewName">Your Token</h3><p id="previewSymbol">$SYMBOL · Solana</p><p id="previewDesc">Your token description will appear here.</p></div><div class="grid2" style="grid-template-columns:1fr 1fr;margin-top:13px;gap:10px"><div class="stat"><small>Total supply</small><strong id="previewSupply">1B</strong></div><div class="stat"><small>Decimals</small><strong id="previewDecimals">9</strong></div></div></div><div class="notice">✓ Phantom wallet signing<br>✓ SPL token mint on Solana Devnet<br>✓ Token history saved in this browser<br><br>Raydium liquidity transactions are a separate step and are not enabled yet.</div></div></div></section>
 <section class="page" id="page-trending"><div class="hero"><div><div class="eyebrow">DISCOVER & RECREATE</div><h1 class="title">Copy trending coins</h1><div class="sub">Browse recently surfaced Solana tokens and copy their visible details into your own new-token form. This creates a new mint; it does not duplicate or take over the original token.</div></div><button class="btn primary" id="refreshTrending" type="button" onclick="window.alphaRefreshTrending && window.alphaRefreshTrending()">↻ Refresh tokens</button></div>
-<div class="card"><div class="tabs compact-tabs"><button class="tab active" data-feed="trending" onclick="window.alphaSetFeed('trending')">Trending</button><button class="tab" data-feed="new" onclick="window.alphaSetFeed('new')">New</button><span class="source-pill">SOURCE&nbsp; <b>Pump.fun</b></span></div><div class="notice" id="trendNotice" style="margin-bottom:16px">Trending Solana tokens from Pump.fun.</div><div id="trendingList" class="tokenlist"><div class="empty">Tap Refresh tokens to load live Solana listings.</div></div></div></section>
+<div class="card"><div class="tabs compact-tabs"><button class="tab active" data-feed="trending" aria-pressed="true">Trending</button><button class="tab" data-feed="new" aria-pressed="false">New</button><span class="source-pill">SOURCE&nbsp; <b>Pump.fun</b></span></div><div class="notice" id="trendNotice" style="margin-bottom:16px">Trending Solana tokens from Pump.fun.</div><div id="trendingList" class="tokenlist"><div class="empty">Tap Refresh tokens to load live Solana listings.</div></div></div></section>
 <section class="page" id="page-liquidity"><div class="hero"><div><div class="eyebrow">RAYDIUM POOLS</div><h1 class="title">Manage liquidity</h1><div class="sub">Prepare a liquidity pool for one of your tokens. Pool creation and liquidity removal require audited Raydium transaction integration.</div></div></div>
 <div class="grid2"><div class="card"><div class="cardhead"><div class="cardtitle">Create liquidity pool</div><span class="muted">RAYDIUM CPMM</span></div><div class="field"><label>Select token</label><select id="poolToken"><option value="">Select one of your tokens</option></select></div><div class="stat" style="margin-bottom:15px"><small>Selected token balance</small><strong id="poolTokenBalance">—</strong></div><div class="field"><label>Token amount</label><input id="poolAmount" type="number" placeholder="Amount of token"></div><div class="actions" style="margin-top:-8px;margin-bottom:15px"><button class="btn small" data-pct="50">Half</button><button class="btn small" data-pct="90">90%</button><button class="btn small" data-pct="100">Max</button></div><div class="field"><label>Pair with SOL (Devnet)</label><input id="poolSol" type="number" placeholder="e.g. 0.5" step="0.01"></div><div class="actions" style="margin-top:-8px;margin-bottom:16px"><button class="btn small" data-sol="0.1">0.1 SOL</button><button class="btn small" data-sol="0.3">0.3 SOL</button><button class="btn small" data-sol="1">1 SOL</button></div><button class="btn primary" id="createPoolBtn" style="width:100%">Create Raydium CPMM Pool →</button><p class="muted" style="line-height:1.6;margin-top:12px">Devnet only. Your wallet will show the complete transaction before signing. You need the selected token and Devnet SOL for the pool seed, rent and protocol fee.</p></div>
 <div class="card"><div class="cardhead"><div class="cardtitle">Pool overview</div><span class="muted">YOUR POOLS</span></div><div id="poolList"><div class="empty">No pools created from this browser yet.</div></div></div></div>
@@ -142,17 +142,12 @@ renderTokens();renderPools();preview();
   }
   async function pumpRows(kind){
     const sort=kind==='new'?'created_timestamp':'last_trade_timestamp';
-    const url='https://frontend-api-v3.pump.fun/coins?offset=0&limit=50&sort='+sort+'&order=DESC&includeNsfw=false';
+    const url='https://alpha-memes-pump-feed.onrender.com/api/pump/coins?feed='+encodeURIComponent(kind);
     const r=await fetch(url,{cache:'no-store',headers:{'Accept':'application/json'}});
-    if(!r.ok)throw Error('Pump.fun API returned HTTP '+r.status);
-    const raw=await r.json();
-    if(!Array.isArray(raw))throw Error('Pump.fun returned an unexpected response');
-    const seen=new Set();
-    return raw.filter(x=>x&&x.mint&&!x.hidden&&!x.nsfw&&!x.is_banned&&!seen.has(x.mint)&&seen.add(x.mint)).slice(0,40).map(x=>({
-      address:x.mint,name:x.name||'Solana token',symbol:x.symbol||'',image:x.image_uri||'',
-      description:x.description||'',marketCap:Number(x.usd_market_cap||x.market_cap_usd||0),
-      created:Number(x.created_timestamp||0),source:'Pump.fun'
-    }));
+    if(!r.ok)throw Error('Pump.fun feed proxy returned HTTP '+r.status);
+    const payload=await r.json();
+    if(!payload.ok||!Array.isArray(payload.coins))throw Error(payload.error||'Unexpected Pump.fun response');
+    return payload.coins.map(x=>({address:x.mint,name:x.name||'Solana token',symbol:x.symbol||'',image:x.image||'',description:x.description||'',marketCap:Number(x.marketCap||0),created:Number(x.created||0),source:'Pump.fun'}));
   }
   async function refresh(){
     if(busy)return;busy=true;const btn=$('refreshTrending');if(btn){btn.disabled=true;btn.textContent='Loading…'}
@@ -173,9 +168,9 @@ renderTokens();renderPools();preview();
     if(window.alphaShowPage)window.alphaShowPage('create');
     if(typeof window.toast==='function')window.toast('Details copied from Pump.fun. This creates a NEW mint; it does not copy the original token.');
   }
-  document.addEventListener('click',e=>{const b=e.target.closest('[data-feed]');if(b){feed=b.dataset.feed;document.querySelectorAll('[data-feed]').forEach(x=>x.classList.toggle('active',x===b));refresh()}});
+  document.querySelectorAll('#page-trending [data-feed]').forEach(b=>{b.type='button';b.addEventListener('click',e=>{e.preventDefault();feed=b.dataset.feed==='new'?'new':'trending';document.querySelectorAll('#page-trending [data-feed]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});refresh()})});
   window.alphaRefreshTrending=refresh;
-  window.alphaSetFeed=function(next){feed=next;document.querySelectorAll('[data-feed]').forEach(x=>x.classList.toggle('active',x.dataset.feed===feed));refresh()};
+  window.alphaSetFeed=function(next){feed=next==='new'?'new':'trending';document.querySelectorAll('#page-trending [data-feed]').forEach(x=>{x.classList.toggle('active',x.dataset.feed===feed);x.setAttribute('aria-pressed',String(x.dataset.feed===feed))});refresh()};
   document.addEventListener('click',e=>{const n=e.target.closest('.nav[data-page]');if(n&&n.dataset.page==='trending')setTimeout(refresh,80)});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{if(document.getElementById('page-trending')?.classList.contains('active'))refresh()});else if(document.getElementById('page-trending')?.classList.contains('active'))refresh();
 })();</script></body></html>
