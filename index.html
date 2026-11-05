@@ -4,7 +4,7 @@
 <style>
 :root{--bg:#090a10;--panel:#11131d;--panel2:#171a27;--line:#25283a;--muted:#858ba3;--text:#f4f5fb;--purple:#8c5cff;--purple2:#7040e8;--green:#45d6a0;--red:#ff647c;--radius:17px}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 70% -20%,#251a49 0,transparent 42%),var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.app{display:flex;min-height:100vh}.side{width:245px;position:fixed;inset:0 auto 0 0;background:#0d0f18;border-right:1px solid var(--line);padding:25px 16px;display:flex;flex-direction:column;z-index:5}.brand{display:flex;align-items:center;gap:11px;padding:0 10px 30px;font:700 20px 'Space Grotesk'}.brandmark{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#a783ff,#6336df);display:grid;place-items:center;font-weight:800;box-shadow:0 7px 25px #7547e755}.navlabel{color:#666d86;font-size:10px;font-weight:800;letter-spacing:1.5px;padding:15px 12px 9px}.nav{display:flex;align-items:center;gap:12px;padding:12px 13px;border-radius:11px;color:#9ba1b8;font-size:13px;font-weight:600;margin:3px 0;border:1px solid transparent;background:none;text-align:left;width:100%}.nav:hover,.nav.active{background:#211b37;border-color:#392b5e;color:#fff}.ico{width:19px;text-align:center;font-size:16px}.sidebottom{margin-top:auto}.network{margin:12px 5px;padding:13px;border:1px solid var(--line);border-radius:13px;background:#121521}.netdot{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:7px}.network small{color:var(--muted);display:block;margin-top:6px;font-size:11px}.main{margin-left:245px;width:calc(100% - 245px)}.top{height:78px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px;background:#0b0d15c9;position:sticky;top:0;z-index:4;backdrop-filter:blur(18px)}.crumb{font:600 14px 'Space Grotesk';color:#c9cbe0}.topright{display:flex;align-items:center;gap:12px}.badge{border:1px solid #353047;border-radius:30px;padding:8px 12px;font-size:11px;color:#c4b5fd;background:#171326}.wallet{background:linear-gradient(135deg,#9468ff,#7040e8);color:white;border:0;border-radius:11px;padding:11px 17px;font-weight:700;font-size:12px}.content{max-width:1350px;margin:auto;padding:34px}.page{display:none}.page.active{display:block}.hero{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin:5px 0 26px}.eyebrow{font-size:10px;letter-spacing:1.7px;color:#aa8cff;font-weight:800;text-transform:uppercase}.title{font:700 30px 'Space Grotesk';margin:8px 0}.sub{color:var(--muted);font-size:13px;line-height:1.65;max-width:660px}.card{background:linear-gradient(145deg,#151825,#11131d);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin-bottom:18px;box-shadow:0 12px 45px #0002}.cardhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.cardtitle{font:600 15px 'Space Grotesk'}.muted{color:var(--muted);font-size:12px}.grid2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:18px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.field{margin-bottom:17px}.field label{display:block;font-size:11px;color:#b9bdd0;font-weight:700;margin-bottom:8px}.field input,.field textarea,.field select{width:100%;background:#0b0d15;border:1px solid #2a2e41;color:white;border-radius:10px;padding:12px 13px;outline:none;font-size:12px}.field textarea{min-height:84px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:#8b61ff;box-shadow:0 0 0 3px #8b61ff20}.row{display:grid;grid-template-columns:1fr 1fr;gap:13px}.btn{border:1px solid #34384c;background:#1b1e2c;color:#e6e7f2;padding:11px 15px;border-radius:10px;font-size:12px;font-weight:700}.btn:hover{border-color:#8e65ff}.btn.primary{background:linear-gradient(135deg,#9369ff,#7040e8);border:0;color:#fff}.btn.ghost{background:transparent}.btn.small{padding:8px 11px;font-size:11px}.btn:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;gap:9px;flex-wrap:wrap}.toggleline{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid #25283a;font-size:12px;color:#c7c9d8}.toggle{appearance:none;width:35px;height:19px;border-radius:20px;background:#35394a;position:relative;cursor:pointer}.toggle:checked{background:#8054f0}.toggle:after{content:'';position:absolute;width:13px;height:13px;background:white;border-radius:50%;left:3px;top:3px;transition:.2s}.toggle:checked:after{left:19px}.preview{border:1px dashed #3a3651;background:linear-gradient(150deg,#211a38,#11131d);border-radius:14px;padding:23px;text-align:center;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center}.coinimg{width:75px;height:75px;border-radius:22px;background:#29223d;object-fit:cover;display:grid;place-items:center;font-size:30px;color:#b99cff;margin-bottom:15px}.preview h3{margin:3px;font:700 18px 'Space Grotesk'}.preview p{font-size:11px;color:var(--muted)}.tabs{display:flex;gap:7px;border-bottom:1px solid var(--line);margin-bottom:18px;padding-bottom:12px}.tab{border:0;background:none;color:#9298ae;padding:9px 13px;border-radius:9px;font-size:12px;font-weight:700}.tab.active{background:#2a2045;color:#c8b5ff}.tokenlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.token{display:flex;gap:13px;align-items:center;background:#10131d;border:1px solid var(--line);padding:14px;border-radius:13px;min-width:0}.token img{width:43px;height:43px;border-radius:13px;object-fit:cover;background:#24283a}.tokeninfo{min-width:0;flex:1}.tokeninfo strong{font-size:12px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tokeninfo small{display:block;color:var(--muted);font-size:10px;margin-top:5px}.token .btn{white-space:nowrap}.stat{padding:17px;border:1px solid var(--line);border-radius:13px;background:#10131d}.stat small{font-size:10px;color:var(--muted)}.stat strong{display:block;font:700 21px 'Space Grotesk';margin-top:8px}.notice{padding:13px 15px;border-radius:11px;background:#211b32;border:1px solid #49366f;color:#cfc0ff;font-size:11px;line-height:1.6}.warning{background:#261e18;border-color:#5b4229;color:#f0c18c}.empty{text-align:center;padding:38px 15px;color:var(--muted);font-size:12px}.toast{position:fixed;right:22px;bottom:22px;background:#202438;border:1px solid #454b65;border-radius:12px;padding:14px 18px;z-index:20;box-shadow:0 10px 35px #0008;font-size:12px;max-width:360px;display:none}.toast.show{display:block}.modalwrap{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:30;padding:18px}.modalwrap.show{display:flex}.modal{width:min(470px,100%);background:#151825;border:1px solid #393d53;border-radius:17px;padding:24px}.modal h3{font:700 18px 'Space Grotesk';margin:0 0 8px}.modal p{color:var(--muted);font-size:12px;line-height:1.6}.upload{border:1px dashed #46415e;border-radius:12px;padding:15px;text-align:center;color:var(--muted);font-size:11px}.mobilemenu{display:none}
 @media(max-width:900px){.side{width:70px;padding:20px 9px}.brand{padding:0 8px 28px}.brand span:last-child,.nav span:last-child,.navlabel,.network,.sidebottom .muted{display:none}.nav{justify-content:center;padding:13px 4px}.main{margin-left:70px;width:calc(100% - 70px)}.grid2{grid-template-columns:1fr}.content{padding:25px 20px}}@media(max-width:600px){.top{padding:0 15px;height:65px}.content{padding:22px 13px}.hero{display:block}.hero .actions{margin-top:15px}.title{font-size:25px}.tokenlist,.grid3{grid-template-columns:1fr}.row{grid-template-columns:1fr}.card{padding:16px}.badge{display:none}.topright{gap:7px}.wallet{padding:10px 12px}.brand{font-size:0}.brandmark{font-size:17px}.side{width:58px}.main{margin-left:58px;width:calc(100% - 58px)}}
-.compact-tabs{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}.compact-tabs .tab{min-width:76px;padding:10px 16px;white-space:nowrap}.compact-tabs select{max-width:145px}@media(max-width:640px){.compact-tabs{gap:6px}.compact-tabs .tab{min-width:64px;padding:9px 12px;font-size:12px}.compact-tabs select{min-width:112px!important;font-size:12px;padding:8px!important}}</style></head><body>
+.compact-tabs{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}.compact-tabs .tab{min-width:76px;padding:10px 16px;white-space:nowrap}.compact-tabs select{max-width:145px}@media(max-width:640px){.compact-tabs{gap:6px}.compact-tabs .tab{min-width:64px;padding:9px 12px;font-size:12px}.compact-tabs select{min-width:112px!important;font-size:12px;padding:8px!important}}select.input{background:#171526!important;color:#f4f1ff!important;border:1px solid #38304f!important;border-radius:10px!important;color-scheme:dark}select.input option{background:#171526;color:#f4f1ff}.compact-tabs{align-items:center;gap:10px}.compact-tabs select{min-width:140px!important;max-width:170px}@media(max-width:640px){.compact-tabs select{min-width:132px!important;max-width:145px}}</style></head><body>
 <div class="app"><aside class="side"><div class="brand"><span class="brandmark">A</span><span>ALPHA MEMES</span></div>
 <div class="navlabel">LAUNCHPAD</div>
 <button class="nav active" data-page="create"><span class="ico">✦</span><span>Create Token</span></button>
@@ -126,43 +126,63 @@ $('confirmRemove').onclick=async()=>{if(!removingPool||!publicKey)return;const p
 
 renderTokens();renderPools();preview();
 <script>
-/* Standalone discovery controls: work even if optional wallet SDK imports fail. */
 (function(){
- let feed='trending', source='dex', rows=[];
- const $=id=>document.getElementById(id);
- const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- function notice(s){if($('trendNotice'))$('trendNotice').textContent=s}
- function draw(){
-  const box=$('trendingList'); if(!rows.length){box.innerHTML='<div class="empty">No Solana tokens were returned by this feed. Try another source or refresh.</div>';return}
-  box.innerHTML=rows.map((t,i)=>'<div class="token"><img src="'+esc(t.icon||t.header||'')+'" onerror="this.style.visibility=\'hidden\'" style="width:42px;height:42px;object-fit:cover;border-radius:12px"><div class="tokeninfo"><strong>'+esc(t.name||'Solana token')+(t.symbol?' · 
-+esc(t.symbol):'')+'</strong><small>'+esc(t.address||'')+(t.marketCap?' · MCap 
-+Number(t.marketCap).toLocaleString():'')+'</small></div><button class="btn small" data-recreate="'+i+'">Copy to Create</button></div>').join('');
-  box.querySelectorAll('[data-recreate]').forEach(b=>b.onclick=()=>{const t=rows[Number(b.dataset.recreate)];if($('tokenName'))$('tokenName').value=t.name||'';if($('tokenSymbol'))$('tokenSymbol').value=t.symbol||'';if($('tokenDesc'))$('tokenDesc').value=t.description||'';if(t.icon&&$('previewImg')){$('previewImg').src=t.icon;$('previewImg').style.display='block';$('previewFallback').style.display='none'}if(window.alphaShowPage)window.alphaShowPage('create')});
- }
- async function refresh(){
-  const box=$('trendingList');box.innerHTML='<div class="empty">Loading live Solana tokens…</div>';
-  try{
-   if(source==='raydium'&&feed==='new'){notice('Raydium provides pool rankings, not a reliable new-token feed. Choose DexScreener for New.');rows=[];draw();return}
-   if(source==='raydium'){
-    const u='https://api-v3.raydium.io/pools/info/list?poolType=all&poolSortField=volume24h&sortType=desc&pageSize=50&page=1';
-    const r=await fetch(u);if(!r.ok)throw Error('Raydium API HTTP '+r.status);const j=await r.json();
-    const list=Array.isArray(j.data?.data)?j.data.data:Array.isArray(j.data)?j.data:[];
+  let feed='trending', source='dex', rows=[], busy=false;
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const short=s=>s?String(s).slice(0,5)+'…'+String(s).slice(-5):'';
+  function message(s){$('trendNotice').textContent=s}
+  function paint(){
+    const box=$('trendingList');
+    if(!rows.length){box.innerHTML='<div class="empty">No matching Solana tokens returned. Switch source or try again in a moment.</div>';return}
+    box.innerHTML=rows.map((t,i)=>'<div class="token"><img src="'+esc(t.image||'')+'" onerror="this.style.display=\'none\'" style="width:44px;height:44px;object-fit:cover;border-radius:12px"><div class="tokeninfo"><strong>'+esc(t.name||'Solana token')+(t.symbol?' · $'+esc(t.symbol):'')+'</strong><small>'+esc(short(t.address))+(t.volume?' · 24h vol $'+Number(t.volume).toLocaleString():'')+(t.liquidity?' · Liq $'+Number(t.liquidity).toLocaleString():'')+'</small></div><button class="btn small" data-copy-row="'+i+'">Copy to Create</button></div>').join('');
+    box.querySelectorAll('[data-copy-row]').forEach(b=>b.addEventListener('click',()=>copy(rows[Number(b.dataset.copyRow)])));
+  }
+  async function dexRows(kind){
+    const url=kind==='trending'?'https://api.dexscreener.com/token-boosts/top/v1':'https://api.dexscreener.com/token-profiles/latest/v1';
+    const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('DexScreener HTTP '+r.status);
+    const raw=await r.json();
+    let list=(Array.isArray(raw)?raw:[]).filter(x=>String(x.chainId).toLowerCase()==='solana');
+    if(!list.length&&kind==='trending'){
+      const rr=await fetch('https://api.dexscreener.com/token-profiles/latest/v1',{cache:'no-store'});
+      if(!rr.ok)throw Error('DexScreener fallback HTTP '+rr.status);
+      list=(await rr.json()).filter(x=>String(x.chainId).toLowerCase()==='solana');
+      message('No boosted tokens in the top-boost feed right now. Showing active Solana profiles ranked by 24h trading volume.');
+    }
+    const out=list.slice(0,35).map(x=>({address:x.tokenAddress||'',name:x.description||x.header||'Solana token',symbol:'',image:x.icon||'',description:x.description||'',volume:0,liquidity:0,source:'DexScreener'})).filter(x=>x.address);
+    await Promise.all(out.slice(0,30).map(async t=>{try{const q=await fetch('https://api.dexscreener.com/latest/dex/tokens/'+encodeURIComponent(t.address),{cache:'no-store'});if(!q.ok)return;const j=await q.json();const p=(j.pairs||[]).filter(z=>z.chainId==='solana').sort((a,b)=>(Number(b.volume?.h24)||0)-(Number(a.volume?.h24)||0))[0];if(p){t.name=p.baseToken?.name||t.name;t.symbol=p.baseToken?.symbol||'';t.image=p.info?.imageUrl||t.image;t.volume=Number(p.volume?.h24)||0;t.liquidity=Number(p.liquidity?.usd)||0;t.description=p.info?.websites?.[0]?.url||t.description}}catch(_){}}));
+    if(kind==='trending'&&out.length)out.sort((a,b)=>b.volume-a.volume);
+    return out;
+  }
+  async function raydiumRows(kind){
+    if(kind==='new')return [];
+    const url='https://api-v3.raydium.io/pools/info/list?poolType=all&poolSortField=volume24h&sortType=desc&pageSize=100&page=1';
+    const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('Raydium HTTP '+r.status);
+    const j=await r.json();const list=j.data?.data||j.data||[];
     const skip=new Set(['So11111111111111111111111111111111111111112','EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v','Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB']);
-    const seen=new Set();rows=[];
-    for(const p of list){const a=p.mintA||{},b=p.mintB||{},m=[a,b].find(x=>x.address&&!skip.has(x.address));if(!m||seen.has(m.address))continue;seen.add(m.address);rows.push({address:m.address,name:m.name||m.symbol||'Solana token',symbol:m.symbol,icon:m.logoURI||m.logoUri,marketCap:p.marketCap,description:'',source:'Raydium'})}
-    notice('Raydium live pools ranked by 24-hour volume.');draw();return;
-   }
-   const endpoint=feed==='trending'?'https://api.dexscreener.com/token-boosts/top/v1':'https://api.dexscreener.com/token-profiles/latest/v1';
-   const r=await fetch(endpoint,{cache:'no-store'});if(!r.ok)throw Error('DexScreener API HTTP '+r.status);
-   const data=await r.json();rows=(Array.isArray(data)?data:[]).filter(x=>String(x.chainId).toLowerCase()==='solana').slice(0,40).map(x=>({address:x.tokenAddress||'',name:x.description||x.header||'Solana token',symbol:'',icon:x.icon||x.header||'',description:x.description||'',source:'DexScreener'})).filter(x=>x.address);
-   const addrs=rows.slice(0,15).map(x=>x.address);
-   await Promise.all(addrs.map(async a=>{try{const q=await fetch('https://api.dexscreener.com/latest/dex/tokens/'+a);if(!q.ok)return;const j=await q.json();const p=(j.pairs||[]).filter(z=>z.chainId==='solana').sort((x,y)=>(y.volume?.h24||0)-(x.volume?.h24||0))[0];if(!p)return;const t=rows.find(z=>z.address===a);if(t){t.name=p.baseToken?.name||t.name;t.symbol=p.baseToken?.symbol||'';t.marketCap=p.marketCap||p.fdv;t.icon=p.info?.imageUrl||t.icon}}catch(e){}}));
-   notice(feed==='trending'?'DexScreener Top Boosts · live Solana tokens with active boosts.':'DexScreener Latest Profiles · recently published Solana tokens.');draw();
-  }catch(e){box.innerHTML='<div class="empty">Could not load live listings: '+esc(e.message)+'. Check connection or try another source.</div>';notice('Feed request failed.')}
- }
- document.addEventListener('click',e=>{const b=e.target.closest('[data-feed]');if(!b)return;feed=b.dataset.feed;document.querySelectorAll('[data-feed]').forEach(x=>x.classList.toggle('active',x===b));refresh()});
- $('trendSource')?.addEventListener('change',e=>{source=e.target.value;refresh()});
- $('refreshTrending')?.addEventListener('click',refresh);
- window.addEventListener('load',()=>{if(location.hash==='#trending-autoload')refresh()});
+    const seen=new Set(),out=[];
+    for(const p of list){const a=p.mintA||{},b=p.mintB||{};const candidates=[a,b].map(x=>typeof x==='string'?{address:x}:x);const m=candidates.find(x=>x.address&&!skip.has(x.address));if(!m||seen.has(m.address))continue;seen.add(m.address);out.push({address:m.address,name:m.name||m.symbol||'Solana token',symbol:m.symbol||'',image:m.logoURI||m.logoUri||'',volume:Number(p.day?.volume||p.volume24h)||0,liquidity:Number(p.tvl||p.liquidity)||0,source:'Raydium'});}
+    return out;
+  }
+  async function refresh(){
+    if(busy)return;busy=true;const btn=$('refreshTrending');if(btn){btn.disabled=true;btn.textContent='Loading…'}
+    $('trendingList').innerHTML='<div class="empty">Loading live Solana markets…</div>';
+    try{
+      if(source==='raydium'&&feed==='new'){rows=[];message('Raydium pool rankings do not provide a reliable new-token feed. Select DexScreener to browse new profiles.');paint();return}
+      rows=source==='raydium'?await raydiumRows(feed):await dexRows(feed);
+      if(!(source==='dex'&&feed==='trending'&&$('trendNotice').textContent.includes('No boosted tokens')))message(source==='raydium'?'Raydium pools ranked by 24-hour trading volume.':'DexScreener '+(feed==='trending'?'Top Boosts':'Latest Solana Profiles')+'.');
+      paint();
+    }catch(e){rows=[];$('trendingList').innerHTML='<div class="empty">Live feed error: '+esc(e.message)+'. Please try again.</div>';message('Could not reach the selected market-data API.')}
+    finally{busy=false;if(btn){btn.disabled=false;btn.textContent='↻ Refresh tokens'}}
+  }
+  function copy(t){
+    $('tokenName').value=t.name||'';$('tokenSymbol').value=t.symbol||'';$('tokenDesc').value=t.description||'';
+    if(t.image){$('previewImg').src=t.image;$('previewImg').style.display='block';$('previewFallback').style.display='none'}
+    if(window.alphaShowPage)window.alphaShowPage('create');
+    if(typeof window.toast==='function')window.toast('Details copied. This creates a new token mint.');
+  }
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-feed]');if(b){feed=b.dataset.feed;document.querySelectorAll('[data-feed]').forEach(x=>x.classList.toggle('active',x===b));refresh()}});
+  $('trendSource').addEventListener('change',e=>{source=e.target.value;refresh()});
+  $('refreshTrending').addEventListener('click',refresh);
 })();
 </script></script></body></html>
